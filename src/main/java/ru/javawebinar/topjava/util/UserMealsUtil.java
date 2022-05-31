@@ -25,6 +25,9 @@ public class UserMealsUtil {
         List<UserMealWithExcess> mealsTo = filteredByCycles(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000);
         mealsTo.forEach(System.out::println);
 
+        List<UserMealWithExcess> mealsTo2 = filteredWithRecursion(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000, new HashMap<>(), new ArrayList<>(), 0);
+        mealsTo2.forEach(System.out::println);
+
         System.out.println(filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), 2000));
     }
 
@@ -38,6 +41,19 @@ public class UserMealsUtil {
             if (TimeUtil.isBetweenHalfOpen(toLocalTime(meal), startTime, endTime)) {
                 mealsWithExcess.add(getUserMealWithExcess(meal, caloriesMap.get(getLocalDate(meal)) <= caloriesPerDay));
             }
+        }
+        return mealsWithExcess;
+    }
+
+    public static List<UserMealWithExcess> filteredWithRecursion(List<UserMeal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay, Map<LocalDate, Integer> map, List<UserMealWithExcess> mealsWithExcess, int count) {
+        UserMeal meal = (UserMeal) meals.toArray()[count];
+        map.merge(getLocalDate(meal), meal.getCalories(), Integer::sum);
+        count++;
+        if (count < meals.size()) {
+            filteredWithRecursion(meals, startTime, endTime, caloriesPerDay, map, mealsWithExcess, count);
+        }
+        if (TimeUtil.isBetweenHalfOpen(toLocalTime(meal), startTime, endTime)) {
+            mealsWithExcess.add(getUserMealWithExcess(meal, map.get(getLocalDate(meal)) <= caloriesPerDay));
         }
         return mealsWithExcess;
     }
