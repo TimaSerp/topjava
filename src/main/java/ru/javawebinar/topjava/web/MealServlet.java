@@ -2,7 +2,6 @@ package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.DateUtil;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -35,17 +34,21 @@ public class MealServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if (action.equalsIgnoreCase("delete")) {
-            int id = Integer.parseInt(request.getParameter("mealId"));
+            int id = Integer.parseInt(request.getParameter("id"));
             mc.deleteMeal(id);
             forward = LIST_MEAL;
             request.setAttribute("meals", mc.getAllMeals());
         } else if (action.equalsIgnoreCase("edit")) {
-            int id = Integer.parseInt(request.getParameter("mealId"));
+            int id = Integer.parseInt(request.getParameter("id"));
             forward = INSERT_OR_EDIT;
             request.setAttribute("meal", mc.getMeal(id));
         } else if (action.equalsIgnoreCase("listMeal")) {
             forward = LIST_MEAL;
             request.setAttribute("meals", mc.getAllMeals());
+        } else if (action.equalsIgnoreCase("insert")) {
+            int id = mc.getUniqueId();
+            forward = INSERT_OR_EDIT;
+            request.setAttribute("meal", mc.getMeal(id));
         } else {
             forward = INSERT_OR_EDIT;
         }
@@ -56,15 +59,12 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        LocalDateTime ldt = DateUtil.formatStringToLocalDateTime(request.getParameter("dateTime"));
+        response.setContentType("text/html;charset=utf-8");
+        LocalDateTime ldt = LocalDateTime.parse(request.getParameter("dateTime"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
         int id = Integer.parseInt(request.getParameter("mealId"));
-        Meal meal = new Meal(ldt, description, calories);
-        if (id >= 0) {
-            meal.setId(id);
-        }
-        mc.addMeal(meal);
+        mc.addMeal(new Meal(ldt, description, calories, id));
 
         RequestDispatcher view = request.getRequestDispatcher(LIST_MEAL);
         request.setAttribute("meals", mc.getAllMeals());

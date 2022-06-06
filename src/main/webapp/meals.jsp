@@ -6,8 +6,6 @@
     <title>Моя еда</title>
 </head>
 <body>
-<h3><a href="index.html">На домашнюю страницу</a></h3>
-<hr>
 <table align="justify" border="1">
     <caption><b>Моя еда</b></caption>
     <thead>
@@ -30,6 +28,8 @@
     </c:forEach>
     </tbody>
 </table>
-<p><a href="meals?action=edit">Add User</a></p>
+<p><a href="meals?action=insert">Add User</a></p>
+<hr>
+<h3><a href="index.html">На домашнюю страницу</a></h3>
 </body>
 </html>

@@ -30,7 +30,7 @@ public class CollectionController implements MealController {
         if (meal.getId() != null && !mealMap.isEmpty() && mealMap.containsKey(id)) {
             mealMap.put(id, meal);
         } else {
-            mealMap.put(countId.getAndIncrement(), meal);
+            mealMap.put(countId.getAndIncrement() - 1, meal);
         }
     }
 
@@ -41,15 +41,24 @@ public class CollectionController implements MealController {
 
     @Override
     public Meal getMeal(int id) {
-        return mealMap.get(id);
+        if (mealMap.containsKey(id)) {
+            return mealMap.get(id);
+        } else {
+            return new Meal(null, null, 0, id);
+        }
     }
 
     @Override
     public List<MealTo> getAllMeals() {
         List<Meal> meals = new ArrayList<>();
-        for (Map.Entry<Integer, Meal> entry: mealMap.entrySet()) {
+        for (Map.Entry<Integer, Meal> entry : mealMap.entrySet()) {
             meals.add(entry.getValue());
         }
         return MealsUtil.filteredByStreams(meals, LocalTime.of(0, 0), LocalTime.of(23, 59), CALORIES_PER_DAY);
+    }
+
+    @Override
+    public int getUniqueId() {
+        return countId.getAndIncrement();
     }
 }

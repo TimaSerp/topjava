@@ -13,4 +13,6 @@ public interface MealController {
     Meal getMeal(int id);
 
     List<MealTo> getAllMeals();
+
+    int getUniqueId();
 }
