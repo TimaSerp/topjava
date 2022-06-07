@@ -28,7 +28,7 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         log.debug("redirect to meals");
-        response.setContentType("text/html;charset=utf-8");
+        request.setCharacterEncoding("UTF-8");
 
         String forward;
         String action = request.getParameter("action");
@@ -46,9 +46,8 @@ public class MealServlet extends HttpServlet {
             forward = LIST_MEAL;
             request.setAttribute("meals", mc.getAllMeals());
         } else if (action.equalsIgnoreCase("insert")) {
-            int id = mc.getUniqueId();
             forward = INSERT_OR_EDIT;
-            request.setAttribute("meal", mc.getMeal(id));
+            request.setAttribute("meal", mc.getMeal(-1));
         } else {
             forward = INSERT_OR_EDIT;
         }
@@ -59,12 +58,11 @@ public class MealServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        response.setContentType("text/html;charset=utf-8");
+        request.setCharacterEncoding("UTF-8");
         LocalDateTime ldt = LocalDateTime.parse(request.getParameter("dateTime"));
         String description = request.getParameter("description");
         int calories = Integer.parseInt(request.getParameter("calories"));
-        int id = Integer.parseInt(request.getParameter("mealId"));
-        mc.addMeal(new Meal(ldt, description, calories, id));
+        mc.addOrUpdateMeal(new Meal(ldt, description, calories));
 
         RequestDispatcher view = request.getRequestDispatcher(LIST_MEAL);
         request.setAttribute("meals", mc.getAllMeals());

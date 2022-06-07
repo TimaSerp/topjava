@@ -6,13 +6,11 @@ import ru.javawebinar.topjava.model.MealTo;
 import java.util.List;
 
 public interface MealController {
-    void addMeal(Meal meal);
+    void addOrUpdateMeal(Meal meal);
 
     void deleteMeal(int id);
 
     Meal getMeal(int id);
 
     List<MealTo> getAllMeals();
-
-    int getUniqueId();
 }

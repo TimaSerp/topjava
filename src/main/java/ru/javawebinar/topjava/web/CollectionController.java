@@ -20,17 +20,18 @@ public class CollectionController implements MealController {
     public CollectionController() {
         List<Meal> meals = MealsUtil.initializeMeals();
         for (Meal meal : meals) {
-            addMeal(meal);
+            addOrUpdateMeal(meal);
         }
     }
 
     @Override
-    public void addMeal(Meal meal) {
+    public void addOrUpdateMeal(Meal meal) {
         int id = meal.getId();
-        if (meal.getId() != null && !mealMap.isEmpty() && mealMap.containsKey(id)) {
+        if (id >= 0 && !mealMap.isEmpty() && mealMap.containsKey(id)) {
             mealMap.put(id, meal);
         } else {
-            mealMap.put(countId.getAndIncrement() - 1, meal);
+            meal.setId(countId.get());
+            mealMap.put(countId.getAndIncrement(), meal);
         }
     }
 
@@ -55,10 +56,5 @@ public class CollectionController implements MealController {
             meals.add(entry.getValue());
         }
         return MealsUtil.filteredByStreams(meals, LocalTime.of(0, 0), LocalTime.of(23, 59), CALORIES_PER_DAY);
-    }
-
-    @Override
-    public int getUniqueId() {
-        return countId.getAndIncrement();
     }
 }
