@@ -18,17 +18,17 @@
     <tbody>
     <jsp:useBean id="meals" scope="request" type="java.util.List"/>
     <c:forEach items="${meals}" var="meal">
-        <tr style="${meal.excess ? 'color:red' : 'color:green'}">
-            <td><c:out value="${f:formatLocalDateTime(meal.dateTime)}"/></td>
-            <td><c:out value="${meal.description}"/></td>
-            <td><c:out value="${meal.calories}"/></td>
-            <td><a href="meals?action=edit&id=<c:out value="${meal.id}"/>">Update</a></td>
-            <td><a href="meals?action=delete&id=<c:out value="${meal.id}"/>">Delete</a></td>
+        <tr style="color:${meal.excess ? 'red' : 'green'}">
+            <td>${f:formatLocalDateTime(meal.dateTime)}</td>
+            <td>${meal.description}</td>
+            <td>${meal.calories}</td>
+            <td><a href="meals?action=edit&id=${meal.id}">Update</a></td>
+            <td><a href="meals?action=delete&id=${meal.id}">Delete</a></td>
         </tr>
     </c:forEach>
     </tbody>
 </table>
-<p><a href="meals?action=insert">Add User</a></p>
+<p><a href="meals?action=insert">Добавить еду</a></p>
 <hr>
 <h3><a href="index.html">На домашнюю страницу</a></h3>
 </body>

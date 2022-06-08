@@ -1,21 +1,20 @@
 package ru.javawebinar.topjava.model;
 
 import java.time.LocalDateTime;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class MealTo {
+    private final int id;
     private final LocalDateTime dateTime;
     private final String description;
     private final int calories;
     private final boolean excess;
-    private final Integer id;
 
-    public MealTo(LocalDateTime dateTime, String description, int calories, boolean excess, Integer id) {
+    public MealTo(int id, LocalDateTime dateTime, String description, int calories, boolean excess) {
+        this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
         this.excess = excess;
-        this.id = id;
     }
 
     @Override
