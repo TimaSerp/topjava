@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.model;
+package ru.javawebinar.topjava.to;
 
 import java.time.LocalDateTime;
 
@@ -13,12 +13,15 @@ public class MealTo {
 
     private final boolean excess;
 
-    public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
+    private final Integer userId;
+
+    public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess, Integer userId) {
         this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
         this.excess = excess;
+        this.userId = userId;
     }
 
     public Integer getId() {
@@ -50,5 +53,9 @@ public class MealTo {
                 ", calories=" + calories +
                 ", excess=" + excess +
                 '}';
+    }
+
+    public Integer getUserId() {
+        return userId;
     }
 }
