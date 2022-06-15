@@ -8,7 +8,6 @@ import ru.javawebinar.topjava.util.MealsUtil;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -59,12 +58,11 @@ public class InMemoryMealRepository implements MealRepository {
     }
 
     @Override
-    public List<Meal> getAll(int userId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+    public List<Meal> getAll(int userId, LocalDate startDate, LocalDate endDate) {
         ConcurrentHashMap<Integer, Meal> userMeals = repository.get(userId);
         return userMeals == null ? Collections.emptyList() : userMeals.values().stream()
                 .sorted(mealComparator)
                 .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDateTime(), toStartLocalDateTime(startDate), toEndLocalDateTime(endDate)))
-                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime))
                 .collect(Collectors.toList());
     }
 

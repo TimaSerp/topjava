@@ -38,34 +38,31 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String action = request.getParameter("action");
-        switch (action == null ? "all" : action) {
-            case "update":
-            case "create":
-                String id = request.getParameter("id");
+        String dateTime = request.getParameter("dateTime");
+        if (dateTime == null) {
+            log.info("get all filtered post");
+            request.setAttribute("controller", controller);
+            controller.setStartDate(getFilterDate(request, "startDate"));
+            controller.setEndDate(getFilterDate(request, "endDate"));
+            controller.setStartTime(getFilterTime(request, "startTime"));
+            controller.setEndTime(getFilterTime(request, "endTime"));
+            response.sendRedirect("meals");
+        } else {
+            log.info("save post");
+            String id = request.getParameter("id");
 
-                Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                        LocalDateTime.parse(request.getParameter("dateTime")),
-                        request.getParameter("description"),
-                        Integer.parseInt(request.getParameter("calories")));
+            Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
+                    LocalDateTime.parse(dateTime),
+                    request.getParameter("description"),
+                    Integer.parseInt(request.getParameter("calories")));
 
-                log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
-                if (meal.isNew()) {
-                    controller.create(meal);
-                } else {
-                    controller.update(meal, Integer.parseInt(id));
-                }
-                response.sendRedirect("meals");
-                break;
-            case "all":
-                log.info("get all filtered post");
-                request.setAttribute("controller", controller);
-                controller.setStartDate(getFilterDate(request, "startDate"));
-                controller.setEndDate(getFilterDate(request, "endDate"));
-                controller.setStartTime(getFilterTime(request, "startTime"));
-                controller.setEndTime(getFilterTime(request, "endTime"));
-                response.sendRedirect("meals");
-                break;
+            log.info(meal.isNew() ? "Create {}" : "Update {}", meal);
+            if (meal.isNew()) {
+                controller.create(meal);
+            } else {
+                controller.update(meal, Integer.parseInt(id));
+            }
+            response.sendRedirect("meals");
         }
     }
 
@@ -83,6 +80,7 @@ public class MealServlet extends HttpServlet {
                 break;
             case "create":
             case "update":
+                log.info("save get");
                 final Meal meal = "create".equals(action) ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
                         controller.get(getId(request));

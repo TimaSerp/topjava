@@ -11,6 +11,7 @@ import java.time.LocalTime;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
+import static ru.javawebinar.topjava.util.MealsUtil.getFilteredTos;
 import static ru.javawebinar.topjava.util.MealsUtil.getTos;
 import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 import static ru.javawebinar.topjava.util.ValidationUtil.checkNew;
@@ -64,12 +65,12 @@ public class MealRestController {
 
     public List<MealTo> getAll() {
         log.info("getAll");
-        return getTos(service.getAll(authUserId(), LocalDate.MIN, LocalDate.MAX, LocalTime.MIN, LocalTime.MAX), authUserCaloriesPerDay());
+        return getTos(service.getAll(authUserId(), LocalDate.MIN, LocalDate.MAX), authUserCaloriesPerDay());
     }
 
     public List<MealTo> getAllFiltered() {
         log.info("getAllFiltered");
-        return getTos(service.getAll(authUserId(), startDate, endDate, startTime, endTime), authUserCaloriesPerDay());
+        return getFilteredTos(service.getAll(authUserId(), startDate, endDate), authUserCaloriesPerDay(), startTime, endTime);
     }
 
     public void delete(int id) {
