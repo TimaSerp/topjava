@@ -1,6 +1,7 @@
 package ru.javawebinar.topjava.to;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 public class MealTo {
     private final Integer id;
@@ -13,15 +14,12 @@ public class MealTo {
 
     private final boolean excess;
 
-    private final Integer userId;
-
-    public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess, Integer userId) {
+    public MealTo(Integer id, LocalDateTime dateTime, String description, int calories, boolean excess) {
         this.id = id;
         this.dateTime = dateTime;
         this.description = description;
         this.calories = calories;
         this.excess = excess;
-        this.userId = userId;
     }
 
     public Integer getId() {
@@ -30,6 +28,10 @@ public class MealTo {
 
     public LocalDateTime getDateTime() {
         return dateTime;
+    }
+
+    public LocalTime getTime() {
+        return LocalTime.of(dateTime.getHour(), dateTime.getMinute());
     }
 
     public String getDescription() {
@@ -53,9 +55,5 @@ public class MealTo {
                 ", calories=" + calories +
                 ", excess=" + excess +
                 '}';
-    }
-
-    public Integer getUserId() {
-        return userId;
     }
 }

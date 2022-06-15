@@ -3,37 +3,41 @@ package ru.javawebinar.topjava.repository.inmemory;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.MealRepository;
+import ru.javawebinar.topjava.util.DateTimeUtil;
 import ru.javawebinar.topjava.util.MealsUtil;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.Month;
-import java.util.ArrayList;
+import java.time.LocalTime;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
-import static ru.javawebinar.topjava.util.DateTimeUtil.isBetweenHalfOpen;
-import static ru.javawebinar.topjava.web.SecurityUtil.authUserId;
+import static java.time.LocalDateTime.MAX;
+import static java.time.LocalDateTime.MIN;
+import static ru.javawebinar.topjava.util.MealsUtil.USER_ONE_ID;
 
 @Repository
 public class InMemoryMealRepository implements MealRepository {
     private final Map<Integer, ConcurrentHashMap<Integer, Meal>> repository = new ConcurrentHashMap<>();
     private final AtomicInteger counter = new AtomicInteger(0);
-    private final LocalDateTime START_DATE = LocalDateTime.of(2022, Month.MAY, 31, 0, 0);
-    private final LocalDateTime END_DATE = LocalDateTime.of(2022, Month.JULY, 31, 0, 0);
+
+    Comparator<Meal> mealComparator = Comparator.comparing(Meal::getDateTime);
+
 
     {
-        MealsUtil.meals.forEach(meal -> save(authUserId(), meal));
+        MealsUtil.meals.forEach(meal -> save(USER_ONE_ID, meal));
+//        MealsUtil.meals2.forEach(meal -> save(USER_TWO_ID, meal));
     }
 
     @Override
     public Meal save(int userId, Meal meal) {
-        if (!repository.containsKey(userId)) {
-            repository.put(userId, new ConcurrentHashMap<>());
-        }
         if (meal.isNew()) {
+            repository.putIfAbsent(userId, new ConcurrentHashMap<>());
             meal.setId(counter.incrementAndGet());
             repository.get(userId).put(meal.getId(), meal);
             return meal;
@@ -44,29 +48,32 @@ public class InMemoryMealRepository implements MealRepository {
 
     @Override
     public boolean delete(int userId, int id) {
-        if (repository.containsKey(userId)) {
-            return repository.get(userId).remove(id) != null;
-        }
-        return false;
+        ConcurrentHashMap<Integer, Meal> userMeals = repository.get(userId);
+        return userMeals != null && userMeals.remove(id) != null;
     }
 
     @Override
     public Meal get(int userId, int id) {
-        if (repository.containsKey(userId)) {
-            return repository.get(userId).get(id);
-        }
-        return null;
+        ConcurrentHashMap<Integer, Meal> userMeals = repository.get(userId);
+        return userMeals == null ? null : userMeals.get(id);
     }
 
     @Override
-    public List<Meal> getAll(int userId) {
-        if (repository.containsKey(userId)) {
-            return repository.get(userId).values().stream()
-                    .sorted()
-                    .filter(meal -> isBetweenHalfOpen(meal.getDateTime(), START_DATE, END_DATE))
-                    .collect(Collectors.toList());
-        }
-        return new ArrayList<>();
+    public List<Meal> getAll(int userId, LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime) {
+        ConcurrentHashMap<Integer, Meal> userMeals = repository.get(userId);
+        return userMeals == null ? Collections.emptyList() : userMeals.values().stream()
+                .sorted(mealComparator)
+                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getDateTime(), toStartLocalDateTime(startDate), toEndLocalDateTime(endDate)))
+                .filter(meal -> DateTimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime))
+                .collect(Collectors.toList());
+    }
+
+    private LocalDateTime toStartLocalDateTime(LocalDate ld) {
+        return LocalDateTime.of(ld.getYear(), ld.getMonth(), ld.getDayOfMonth(), MIN.getHour(), MIN.getMinute());
+    }
+
+    private LocalDateTime toEndLocalDateTime(LocalDate ld) {
+        return LocalDateTime.of(ld.getYear(), ld.getMonth(), ld.getDayOfMonth(), MAX.getHour(), MAX.getMinute());
     }
 }
 
