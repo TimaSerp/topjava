@@ -4,5 +4,10 @@ target
 *.iml
 log
 *.patch
+cv.md
+description.md
+graduation.md
+README.md
+ReleaseNotes.md
 
 

@@ -74,9 +74,9 @@ public class MealServiceTest {
 
     @Test
     public void getBetweenInclusive() {
-        List<Meal> meals = service.getBetweenInclusive(LocalDate.of(2020, Month.JANUARY, 
-                30), LocalDate.of(2020, Month.JANUARY, 30), USER_ID);
-        assertMatch(meals, userMeal3, userMeal2, userMeal1);
+        List<Meal> meals = service.getBetweenInclusive(LocalDate.of(2020, Month.JANUARY, 30),
+                LocalDate.of(2020, Month.JANUARY, 30), USER_ID);
+        assertMatch(meals, userMeal4, userMeal3, userMeal2, userMeal1);
     }
 
     @Test
@@ -87,13 +87,12 @@ public class MealServiceTest {
 
     @Test
     public void getAll() {
-        assertMatch(service.getAll(USER_ID), userMeal7, userMeal6, userMeal5,
-                userMeal4, userMeal3, userMeal2, userMeal1);
+        assertMatch(service.getAll(USER_ID), userMeal7, userMeal6, userMeal5, userMeal4, userMeal3, userMeal2, userMeal1);
     }
 
     @Test
     public void getAllNotFound() {
-        assertMatch(service.getAll(NOT_FOUND_ID), new ArrayList<>());
+        assertMatch(service.getAll(GUEST_ID), new ArrayList<>());
     }
 
     @Test
@@ -105,15 +104,14 @@ public class MealServiceTest {
 
     @Test
     public void updateNotFound() {
-        assertThrows(NotFoundException.class, () -> service.update(new Meal(NOT_FOUND_ID,
-                userMeal1.getDateTime(), "NOT FOUND UPDATE", 1000), USER_ID));
+        assertThrows(NotFoundException.class, () ->
+                service.update(new Meal(NOT_FOUND_ID, userMeal1.getDateTime(), "NOT FOUND UPDATE", 1000), USER_ID));
     }
 
     @Test
     public void updateForeignMeal() {
         assertThrows(NotFoundException.class, () -> service.update(new Meal(ADMIN_MEAL_ID,
-                LocalDateTime.of(2000, Month.MAY, 1, 1, 1), 
-                "NOT FOUND UPDATE", 1000), USER_ID));
+                LocalDateTime.of(2000, Month.MAY, 1, 1, 1), "NOT FOUND UPDATE", 1000), USER_ID));
     }
 
     @Test
