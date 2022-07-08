@@ -4,10 +4,12 @@ import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import ru.javawebinar.topjava.model.Meal;
+import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.MealRepository;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfDayOrMin;
 import static ru.javawebinar.topjava.util.DateTimeUtil.atStartOfNextDayOrMax;
@@ -46,5 +48,13 @@ public class MealService {
     public Meal create(Meal meal, int userId) {
         Assert.notNull(meal, "meal must not be null");
         return repository.save(meal, userId);
+    }
+
+    public Map<User, List<Meal>> getUserWithMealsById(int userId) {
+        return repository.getUserWithMealsById(userId);
+    }
+
+    public Map<Meal, User> getMealWithUserById(int id, int userId) {
+        return repository.getMealWithUserById(id, userId);
     }
 }
