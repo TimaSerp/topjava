@@ -7,17 +7,22 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javawebinar.topjava.service.UserService;
 
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-public class RootController extends AbstractController {
+public class RootController {
     private static final Logger log = LoggerFactory.getLogger(RootController.class);
 
     @Autowired
     private UserService service;
+
+    @GetMapping("/")
+    public String root() {
+        log.info("root");
+        return "index";
+    }
 
     @GetMapping("/users")
     public String getUsers(Model model) {

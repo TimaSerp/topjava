@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.web;
+package ru.javawebinar.topjava.web.meal;
 
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.service.MealService;
 import ru.javawebinar.topjava.util.MealsUtil;
+import ru.javawebinar.topjava.web.SecurityUtil;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -29,26 +29,29 @@ import static ru.javawebinar.topjava.util.ValidationUtil.assureIdConsistent;
 
 @Controller
 @RequestMapping("/meals")
-public class MealController extends AbstractController {
-    private static final Logger log = getLogger(MealController.class);
+public class JspMealController extends AbstractMealController {
+    private static final Logger log = getLogger(JspMealController.class);
 
     @Autowired
-    private MealService service;
+    public JspMealController(MealService service) {
+        super(service);
+    }
+
+    @GetMapping("../")
+    public String root() {
+        log.info("root");
+        return "index";
+    }
 
     @GetMapping(params = "action=delete")
     public String delete(HttpServletRequest request) {
-        int id = getId(request);
-        int userId = SecurityUtil.authUserId();
-        log.info("delete meal {} for user {}", id, userId);
-        service.delete(id, userId);
+        super.delete(getId(request));
         return "redirect:meals";
     }
 
     @GetMapping(params = "action=update")
     public String update(HttpServletRequest request) {
-        log.info("update meal");
-        final Meal meal = service.get(getId(request), SecurityUtil.authUserId());
-        return setSaveAttribute(request, meal);
+        return setSaveAttribute(request, super.get(getId(request)));
     }
 
     private String setSaveAttribute(HttpServletRequest request, Meal meal) {
@@ -74,10 +77,10 @@ public class MealController extends AbstractController {
         if (StringUtils.hasLength(request.getParameter("id"))) {
             log.info("update {} for user {}", meal, userId);
             assureIdConsistent(meal, getId(request));
-            service.update(meal, userId);
+            super.update(meal, userId);
         } else {
             log.info("create {} for user {}", meal, userId);
-            service.create(meal, userId);
+            super.create(meal);
         }
         return "redirect:meals";
     }
@@ -89,8 +92,8 @@ public class MealController extends AbstractController {
         LocalDate endDate = parseLocalDate(request.getParameter("endDate"));
         LocalTime startTime = parseLocalTime(request.getParameter("startTime"));
         LocalTime endTime = parseLocalTime(request.getParameter("endTime"));
-        List<Meal> mealsDateFiltered = service.getBetweenInclusive(startDate, endDate, userId);
-        request.setAttribute("meals", MealsUtil.getFilteredTos(mealsDateFiltered, SecurityUtil.authUserCaloriesPerDay(), startTime, endTime));
+//        List<Meal> mealsDateFiltered = service.getBetweenInclusive(startDate, endDate, userId);
+//        request.setAttribute("meals", MealsUtil.getFilteredTos(mealsDateFiltered, SecurityUtil.authUserCaloriesPerDay(), startTime, endTime));
         return "meals";
     }
 
@@ -98,8 +101,8 @@ public class MealController extends AbstractController {
     public String getAll(HttpServletRequest request) {
         int userId = SecurityUtil.authUserId();
         log.info("getAll for user {}", userId);
-        request.setAttribute("meals", MealsUtil.getTos(service.getAll(SecurityUtil.authUserId()),
-                SecurityUtil.authUserCaloriesPerDay()));
+//        request.setAttribute("meals", MealsUtil.getTos(service.getAll(SecurityUtil.authUserId()),
+//                SecurityUtil.authUserCaloriesPerDay()));
         return "meals";
     }
 

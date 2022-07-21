@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import ru.javawebinar.topjava.model.Role;
+import ru.javawebinar.topjava.model.RoleWithId;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
@@ -25,6 +26,8 @@ import java.util.*;
 public class JdbcUserRepository implements UserRepository {
 
     private static final BeanPropertyRowMapper<User> ROW_MAPPER = BeanPropertyRowMapper.newInstance(User.class);
+
+    private static final BeanPropertyRowMapper<RoleWithId> ROLE_ROW_MAPPER = BeanPropertyRowMapper.newInstance(RoleWithId.class);
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -90,7 +93,7 @@ public class JdbcUserRepository implements UserRepository {
         List<String> roles = jdbcTemplate.queryForList("SELECT role FROM user_roles WHERE user_id=?", String.class, id);
         User user = getSingleResult(users);
         if (user != null) {
-            List<Role> enumRoles = new ArrayList<>();
+            EnumSet<Role> enumRoles = EnumSet.noneOf(Role.class);
             for (String role : roles) {
                 enumRoles.add(Role.valueOf(role));
             }
@@ -108,19 +111,31 @@ public class JdbcUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         List<User> users = jdbcTemplate.query("SELECT * FROM users ORDER BY name, email", ROW_MAPPER);
-        List<Integer> ids = jdbcTemplate.queryForList("SELECT user_id FROM user_roles ORDER BY user_id", Integer.class);
-        List<String> roles = jdbcTemplate.queryForList("SELECT role FROM user_roles ORDER BY user_id", String.class);
+        List<RoleWithId> rolesWithId = jdbcTemplate.query("SELECT user_id, role FROM user_roles", ROLE_ROW_MAPPER);
+        Map<Integer, Role> roles = new HashMap<>();
+        for (RoleWithId role: rolesWithId) {
+            roles.put(role.getUserId(), Role.valueOf(role.getRole()));
+        }
         for (User user: users) {
             int id = user.id();
-            if (ids.contains(id)) {
-                user.setRoles(List.of(Role.valueOf(roles.get(ids.indexOf(id)))));
-                if (ids.indexOf(id) != ids.lastIndexOf(id)) {
-                    user.addRole(Role.valueOf(roles.get(ids.lastIndexOf(id))));
-                }
-            } else {
-                user.setRoles(Collections.emptyList());
+            Role role = roles.get(id);
+            if (role != null) {
+                user.addRole(role);
             }
         }
+////        List<Integer> ids = jdbcTemplate.queryForList("SELECT user_id FROM user_roles ORDER BY user_id", Integer.class);
+////        List<String> roles = jdbcTemplate.queryForList("SELECT role FROM user_roles ORDER BY user_id", String.class);
+//        for (User user: users) {
+//            int id = user.id();
+//            if (ids.contains(id)) {
+//                user.setRoles(List.of(Role.valueOf(roles.get(ids.indexOf(id)))));
+//                if (ids.indexOf(id) != ids.lastIndexOf(id)) {
+//                    user.addRole(Role.valueOf(roles.get(ids.lastIndexOf(id))));
+//                }
+//            } else {
+//                user.setRoles(Collections.emptyList());
+//            }
+//        }
         return users;
     }
 
