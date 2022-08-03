@@ -17,7 +17,7 @@
             <span class="fa fa-plus"></span>
             <spring:message code="common.add"/>
         </button>
-        <table class="table table-striped" id="datatable">
+        <table class="table table-striped" id="usersDatatable">
             <thead>
             <tr>
                 <th><spring:message code="user.name"/></th>
@@ -53,7 +53,7 @@
                 <button type="button" class="close" data-dismiss="modal" onclick="closeNoty()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="detailsForm">
+                <form id="userDetailsForm">
                     <input type="hidden" id="id" name="id">
 
                     <div class="form-group">

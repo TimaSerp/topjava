@@ -1,14 +1,14 @@
 const userAjaxUrl = "admin/users/";
 
 // https://stackoverflow.com/a/5064235/548473
-const ctx = {
+const userCtx = {
     ajaxUrl: userAjaxUrl
 };
 
 // $(document).ready(function () {
 $(function () {
-    makeEditable(
-        $("#datatable").DataTable({
+    makeUsersEditable(
+        $("#usersDatatable").DataTable({
             "paging": false,
             "info": true,
             "columns": [
@@ -45,3 +45,8 @@ $(function () {
         })
     );
 });
+
+function makeUsersEditable(datatableApi) {
+    userCtx.datatableApi = datatableApi;
+    makeEditable(userCtx, $("#userDetailsForm"));
+}

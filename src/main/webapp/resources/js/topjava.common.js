@@ -1,8 +1,9 @@
 let form;
+let ctx;
 
-function makeEditable(datatableApi) {
-    ctx.datatableApi = datatableApi;
-    form = $('#detailsForm');
+function makeEditable(context, entityForm) {
+    ctx = context;
+    form = entityForm;
     $(".delete").click(function () {
         if (confirm('Are you sure?')) {
             deleteRow($(this).closest('tr').attr("id"));
