@@ -13,7 +13,7 @@ import java.util.List;
 
 import static ru.javawebinar.topjava.web.meal.MealUIController.UI_URL;
 
-@Controller
+@RestController
 @RequestMapping(value = UI_URL, produces = MediaType.APPLICATION_JSON_VALUE)
 public class MealUIController extends AbstractMealController {
     public static final String UI_URL = "/profile/meals";
