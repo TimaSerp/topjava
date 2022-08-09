@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static ru.javawebinar.topjava.MealTestData.*;
 import static ru.javawebinar.topjava.UserTestData.USER_ID;
 import static ru.javawebinar.topjava.UserTestData.user;
-import static ru.javawebinar.topjava.util.MealsUtil.createTo;
+import static ru.javawebinar.topjava.util.MealsUtil.asTo;
 import static ru.javawebinar.topjava.util.MealsUtil.getTos;
 
 class MealRestControllerTest extends AbstractControllerTest {
@@ -85,7 +85,7 @@ class MealRestControllerTest extends AbstractControllerTest {
                 .param("endDate", "2020-01-31").param("endTime", "11:00"))
                 .andExpect(status().isOk())
                 .andDo(print())
-                .andExpect(TO_MATCHER.contentJson(createTo(meal5, true), createTo(meal1, false)));
+                .andExpect(TO_MATCHER.contentJson(asTo(meal5, true), asTo(meal1, false)));
     }
 
     @Test
